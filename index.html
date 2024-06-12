@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap" rel="stylesheet">
+    <style>
+        *, ::after, ::before{
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+            font-family: 'outfit', sans-serif;
+        }
+        main{
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            max-width: 50vw;
+            h1{
+                font-size: 2.5rem;
+                margin-bottom: 1rem;
+            }
+            p{
+                font-size: 1.5rem;
+                text-align: center;
+                margin-bottom: 1.5rem;
+            }
+            button{
+                padding: 0.5rem 1.5rem;
+                border-radius: 0.5rem;
+                font-size: 1.5rem;
+                font-family: 'outfit', sans-serif;
+                font-weight: 500;
+                background-color: #000;
+                color: #fff;
+                border: none;
+                transition: all 200ms ease-in-out;
+               &:hover, &:focus-visible{
+                cursor: pointer;
+                box-shadow: 5px 5px 10px #000;
+               } 
+               &:focus-visible{
+                border: 2px solid #fff;
+               }
+            }
+            .details{
+                display: none;
+                h2{
+                    margin-bottom: 1rem;
+                }
+                p{
+                    text-align: start;
+                    /* transform: translateX(-2.5rem); */
+                }
+            }
+            a{
+                font-size: 1.5rem;
+                margin-bottom: 2rem;
+                text-decoration: none;
+                color: blue;
+                position: relative;
+                &::before{
+                    content: '';
+                    width: 0;
+                    height: 2px;
+                    position: absolute;
+                    background-color: blue;
+                    top: 1.8rem;
+                    transition: width 300ms ease-in-out;
+                }
+                &:hover::before{
+                    width: 100%;
+                }
+                &:focus-visible{
+                    outline: none;
+                    border: none;
+                }
+                &:focus-visible::before{
+                    width: 100%;
+                }
+            }
+        }
+    </style>
+    <title>JS Geolocation API</title>
+</head>
+<body>
+    <main>
+        <h1>Javascript Geo Location API.</h1>
+        <p>The Geolocation API is a standard API implemented in browsers to retrieve the location of the people who are interacting with a web application.</p>
+        <div class="details">
+            <h2>Your location details.</h2>
+            <p>Lattitude: <code id="latitude"></code></p>
+            <p>Longitude: <code id="longitude"></code></p>
+            <p>Date: <code id="date"></code></p>
+            <p>Time: <code id="time"></code></p>
+        </div>
+        <a href="" id="locationResult" target="_blank"></a>
+        <button id="getLocation">Get Location</button>
+    </main>
+    <script>
+        const locationResult=document.getElementById('locationResult');
+        const date= new Date();
+        const currentDate=`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;//1 is added to the getMonth() since the functions returns months a zero index which means january is 0 and febuarary is 1 which is not how we usually consider months.
+        const currentTime=`${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;//the padStart is a string method that takes two arguments the target length (length of the string after padding) and padstring which is the string you want to add before the existing string.
+        document.getElementById('getLocation').addEventListener('click', ()=>{
+            locationResult.textContent='Retrieving Location. It may take a while...'
+            function success(position){
+                let {coords}=position;
+                document.querySelector('.details').style.display='block';
+                locationResult.textContent='Checkout your location on a map.';
+                // locationResult.href=`https://www.openstreetmap.org?mlat=${coords.latitude}&mlon=${coords.longitude}`;
+                locationResult.href=`https://www.google.com/maps?q=${coords.latitude},${coords.longitude}`;
+                document.getElementById('latitude').textContent=coords.latitude;
+                document.getElementById('longitude').textContent=coords.longitude;
+                document.getElementById('date').textContent=currentDate;
+                document.getElementById('time').textContent=currentTime;
+            };
+            const options={
+                enableHighAccuracy: true,
+                timeout: 300000,//wait for five minutes
+            };
+
+            function error(error){
+                locationResult.textContent = `ERROR(${err.code}): ${err.message}`;
+            };
+
+            navigator.geolocation.getCurrentPosition(success, error, options);
+        });
+    </script>
+</body>
+</html>
