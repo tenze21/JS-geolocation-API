@@ -53,13 +53,12 @@
                }
             }
             .details{
-                display: none;
+                text-align: center;
                 h2{
                     margin-bottom: 1rem;
                 }
                 p{
                     text-align: start;
-                    /* transform: translateX(-2.5rem); */
                 }
             }
             a{
@@ -96,14 +95,15 @@
     <main>
         <h1>Javascript Geo Location API.</h1>
         <p>The Geolocation API is a standard API implemented in browsers to retrieve the location of the people who are interacting with a web application.</p>
-        <div class="details">
+        <div class="details"hidden>
             <h2>Your location details.</h2>
             <p>Lattitude: <code id="latitude"></code></p>
             <p>Longitude: <code id="longitude"></code></p>
+            <p>Location: <code id="location"></code></p>
             <p>Date: <code id="date"></code></p>
             <p>Time: <code id="time"></code></p>
         </div>
-        <a href="" id="locationResult" target="_blank"></a>
+        <a href="" id="locationResult" target="_blank" hidden></a>
         <button id="getLocation">Get Location</button>
     </main>
     <script>
@@ -112,10 +112,11 @@
         const currentDate=`${date.getMonth() + 1}/${date.getDate()}/${date.getFullYear()}`;//1 is added to the getMonth() since the functions returns months a zero index which means january is 0 and febuarary is 1 which is not how we usually consider months.
         const currentTime=`${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;//the padStart is a string method that takes two arguments the target length (length of the string after padding) and padstring which is the string you want to add before the existing string.
         document.getElementById('getLocation').addEventListener('click', ()=>{
+            locationResult.removeAttribute('hidden','');
             locationResult.textContent='Retrieving Location. It may take a while...'
             function success(position){
                 let {coords}=position;
-                document.querySelector('.details').style.display='block';
+                document.querySelector('.details').removeAttribute('hidden','');
                 locationResult.textContent='Checkout your location on a map.';
                 // locationResult.href=`https://www.openstreetmap.org?mlat=${coords.latitude}&mlon=${coords.longitude}`;
                 locationResult.href=`https://www.google.com/maps?q=${coords.latitude},${coords.longitude}`;
@@ -123,16 +124,33 @@
                 document.getElementById('longitude').textContent=coords.longitude;
                 document.getElementById('date').textContent=currentDate;
                 document.getElementById('time').textContent=currentTime;
+
+                // perform reverse geocode
+                fetch(`https://geocode.maps.co/reverse?lat=${coords.latitude}&lon=${coords.longitude}&api_key=666a968c8194e880102121nxg020d6e`)
+                .then(res=>res.json())
+                .then(data=>{
+                    if(data){
+                        // console.log(data);
+                        document.getElementById('location').textContent = `${data.address.county}, ${data.address.city}, ${data.address.country}`;
+                    }else{
+                        document.getElementById('location').textContent = 'Location name not found';
+                    }
+                })
+                .catch(error => {
+                    document.getElementById('location').textContent = 'Error retrieving location name';
+                    console.error('Error:', error);
+                });
             };
             const options={
                 enableHighAccuracy: true,
-                timeout: 300000,//wait for five minutes
+                timeout: 10000,//wait for five minutes
+                maximumAge: 0,// specifies that the browser should return the current position and not a cached position.
             };
 
             function error(error){
-                locationResult.textContent = `ERROR(${err.code}): ${err.message}`;
+                locationResult.textContent = `error(${error.code}): ${error.message}`;
+                locationResult.style.color='red';
             };
-
             navigator.geolocation.getCurrentPosition(success, error, options);
         });
     </script>
