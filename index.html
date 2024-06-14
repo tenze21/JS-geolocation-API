@@ -84,6 +84,9 @@
                 text-align: center;
                 @media screen and (max-width: 550px) {
                     font-size: 1rem;
+                    &::before{
+                        display: none;
+                    }
                 }
                 &::before{
                     content: '';
@@ -93,9 +96,6 @@
                     background-color: blue;
                     top: 1.8rem;
                     transition: width 300ms ease-in-out;
-                    @media screen and (max-width: 550px) {
-                        display: none;
-                    }
                 }
                 &:hover::before{
                     width: 100%;
