@@ -93,6 +93,9 @@
                     background-color: blue;
                     top: 1.8rem;
                     transition: width 300ms ease-in-out;
+                    @media screen and (max-width: 550px) {
+                        display: none;
+                    }
                 }
                 &:hover::before{
                     width: 100%;
@@ -132,6 +135,7 @@
         document.getElementById('getLocation').addEventListener('click', ()=>{
             locationResult.removeAttribute('hidden','');
             locationResult.textContent='Retrieving Location. It may take a while...'
+            locationResult.style.color='blue';
             function success(position){
                 let {coords}=position;
                 document.querySelector('.details').removeAttribute('hidden','');
